@@ -2,7 +2,19 @@
 # Cargar en cada terminal nueva:   source scripts/entorno.sh
 # (no se ejecuta, se "sourcea": define variables y alias en la shell actual)
 
-_RAIZ_TALLER="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Compatible con bash y zsh (zsh es la shell por defecto de Kali Linux).
+# En zsh no existe BASH_SOURCE: la ruta del archivo cargado se obtiene con ${(%):-%x}.
+if [[ -n "${ZSH_VERSION:-}" ]]; then
+  eval '_ARCHIVO_ENTORNO="${(%):-%x}"'
+else
+  _ARCHIVO_ENTORNO="${BASH_SOURCE[0]}"
+fi
+_RAIZ_TALLER="$(cd "$(dirname "$_ARCHIVO_ENTORNO")/.." && pwd)"
+# Respaldo: si no se encuentra .env junto al script, se usa la carpeta actual.
+if [[ ! -f "$_RAIZ_TALLER/.env" && -f "$PWD/.env" ]]; then
+  _RAIZ_TALLER="$PWD"
+fi
+unset _ARCHIVO_ENTORNO
 
 if [[ -f "$_RAIZ_TALLER/.env" ]]; then
   set -a

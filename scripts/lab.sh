@@ -28,12 +28,12 @@ AWS_SECRET_ACCESS_KEY=testing
 AWS_DEFAULT_REGION=us-east-1
 EOF
   chmod 600 .env
-  echo "[+] Se creó .env con una contraseña aleatoria para MinIO (consultar con: cat .env)."
+  echo "[+] Se creó .env con una contraseña aleatoria para el almacenamiento (consultar con: cat .env)."
 fi
-[[ -f .gitignore ]] || echo "[!] Falta .gitignore: .env podría subirse a GitHub por error." >&2
+[[ -f .gitignore ]] || echo "[!] Aviso (no es un error): falta .gitignore, así que .env podría subirse a GitHub. Ver docs/00-preparacion.md." >&2
 
 esperar_minio() {
-  echo -n "[*] Esperando a MinIO"
+  echo -n "[*] Esperando al almacenamiento S3"
   for _ in $(seq 1 30); do
     if curl -fsS http://localhost:9000/minio/health/live >/dev/null 2>&1; then
       echo " listo."
@@ -43,7 +43,7 @@ esperar_minio() {
     sleep 2
   done
   echo
-  echo "[x] MinIO no respondió en 60 s. Revisar: ./scripts/lab.sh logs" >&2
+  echo "[x] El almacenamiento no respondió en 60 s. Revisar: ./scripts/lab.sh logs" >&2
   return 1
 }
 
@@ -52,8 +52,8 @@ case "${1:-}" in
     "${COMPOSE[@]}" up -d
     esperar_minio
     echo "[+] Nube privada en marcha:"
-    echo "    API S3 (MinIO) : http://localhost:9000"
-    echo "    Consola MinIO  : http://localhost:9001"
+    echo "    API S3 (Silo)  : http://localhost:9000"
+    echo "    Consola web    : http://localhost:9001"
     echo "    APIs AWS (Moto): http://localhost:5000  (panel: http://localhost:5000/moto-api/)"
     echo "    Siguiente paso : source scripts/entorno.sh"
     ;;

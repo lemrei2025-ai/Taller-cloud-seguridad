@@ -65,6 +65,7 @@ awsm sts get-caller-identity             # debe mostrar la cuenta 123456789012
 
 | Síntoma | Causa probable | Solución |
 |---|---|---|
+| `source scripts/entorno.sh` responde «Falta .env» aunque el archivo existe | Versión antigua de `entorno.sh`, que solo funcionaba en bash (Kali usa zsh por defecto) | Actualizar el repositorio; como solución inmediata, ejecutar `bash` y luego `source scripts/entorno.sh` |
 | `permission denied ... docker.sock` | No se recargó el grupo `docker` | Ejecutar `newgrp docker` o cerrar la sesión |
 | `port is already allocated` | Otro programa usa el puerto 9000, 9001 o 5000 | Identificarlo con `sudo ss -tlnp` y detenerlo |
 | `pull access denied for minio/minio` | MinIO eliminó sus imágenes de Docker Hub en septiembre de 2026 | Usar la versión actual del repositorio, que emplea `pgsty/silo` |
