@@ -1,0 +1,45 @@
+# Nube privada del taller: almacenamiento S3 (MinIO) + APIs de AWS emuladas (Moto)
+# Todos los puertos se publican SOLO en 127.0.0.1: la nube no queda expuesta a la red.
+
+name: nube-taller
+
+services:
+  minio:
+    # Última imagen comunitaria publicada por MinIO (la comunidad pasó a "solo código fuente"
+    # en octubre de 2025). Se fija a propósito: en el Lab 5 se escanea con Trivy.
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    container_name: nube-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Falta MINIO_ROOT_USER en .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Falta MINIO_ROOT_PASSWORD en .env}
+    ports:
+      - "127.0.0.1:9000:9000"   # API S3
+      - "127.0.0.1:9001:9001"   # Consola web
+    volumes:
+      - minio-datos:/data
+    networks: [nube]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  moto:
+    # Emulador de APIs de AWS (IAM, STS, Secrets Manager, S3...). Licencia Apache 2.0, sin token.
+    image: motoserver/moto:latest
+    container_name: nube-moto
+    environment:
+      MOTO_PORT: "5000"
+    ports:
+      - "127.0.0.1:5000:5000"
+    networks: [nube]
+    restart: unless-stopped
+
+networks:
+  nube:
+    driver: bridge
+
+volumes:
+  minio-datos:
