@@ -40,9 +40,10 @@ gitleaks detect --source . -v
 
 ### A.3 · Medición del impacto
 
-Con la `ACCESS_KEY` y la `SECRET_KEY` que reportó gitleaks:
+gitleaks reporta el commit y el archivo donde está la clave `AKIA...`. La clave secreta suele estar en la línea siguiente del mismo archivo, aunque gitleaks no siempre la marque:
 
 ```bash
+git show <COMMIT>:config.py        # el commit que reportó gitleaks
 mc alias set filtrada http://localhost:9000 <ACCESS_KEY> <SECRET_KEY>
 mc ls filtrada/
 mc cat filtrada/app-clientes/clientes.csv

@@ -20,7 +20,7 @@ cd ~/taller-cloud-seguridad
 source scripts/entorno.sh
 ```
 
-Se accede a la consola de MinIO en <http://localhost:9001> con los valores `MINIO_ROOT_USER` y `MINIO_ROOT_PASSWORD` del archivo `.env`. El panel de Moto está disponible en <http://localhost:5000/moto-api/>.
+Se accede a la consola del almacenamiento en <http://localhost:9001> con los valores `MINIO_ROOT_USER` y `MINIO_ROOT_PASSWORD` del archivo `.env`. El panel de Moto está disponible en <http://localhost:5000/moto-api/>.
 
 ## Paso 2 · Reconocimiento de los componentes
 
@@ -48,7 +48,7 @@ ports:
   - "127.0.0.1:9000:9000"
 ```
 
-❓ **Pregunta 2.** ¿Qué cabecera HTTP revela que el servicio es MinIO y qué información aporta a un atacante?
+❓ **Pregunta 2.** ¿Qué cabecera HTTP revela el producto que atiende el servicio (en este laboratorio, Silo, derivado de MinIO) y qué información aporta a un atacante?
 
 ## Paso 4 · Simulación de una exposición accidental
 

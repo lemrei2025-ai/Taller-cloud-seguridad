@@ -6,7 +6,7 @@ Esta guía corresponde al Anexo J del [documento académico](Taller_Nube_Privada
 
 - El facilitador envía el enlace del repositorio y solicita a los participantes ejecutar `scripts/instalar-herramientas.sh` y `scripts/verificar-entorno.sh` en sus equipos. La mayoría de los problemas del día del taller provienen de instalaciones incompletas o de redes saturadas al descargar imágenes.
 - Prepara una **máquina virtual de Kali Linux de respaldo** (OVA) para quienes no cuenten con un entorno funcional.
-- Recorre los cinco laboratorios en un equipo limpio con las versiones vigentes. Este recorrido incluye los comandos `mc` de los Laboratorios 2, 3 y 5 y el escaneo con Trivy, que el documento señala como verificación previa obligatoria.
+- Recorre los cinco laboratorios en un equipo limpio con las versiones fijadas. Los Laboratorios 2 a 5 se validaron con Silo 2026-09-16, mcli, Moto 5.2.3, gitleaks 8.28.0 y Trivy 0.69.3; queda pendiente en el equipo final el arranque con Docker Compose y el escaneo de la imagen (`trivy image`).
 
 ## Guion por bloques
 
@@ -14,11 +14,11 @@ Esta guía corresponde al Anexo J del [documento académico](Taller_Nube_Privada
 |---|---|---|---|
 | Introducción | 20 min | Las brechas en la nube se originan sobre todo en configuraciones del cliente | — |
 | Laboratorio 1 | 30 min | Lo que se publica es superficie de ataque | Grupo `docker` sin recargar; puertos ocupados |
-| Laboratorio 2 | 45 min | El acceso público casi nunca es la necesidad real; se usan URL prefirmadas | Conflicto con Midnight Commander |
+| Laboratorio 2 | 45 min | El acceso público casi nunca es la necesidad real; se usan URL prefirmadas | Conflicto con Midnight Commander; repositorio antiguo con `minio/minio` (`pull access denied`) |
 | Pausa | 10 min | | |
-| Laboratorio 3 | 40 min | La identidad es el nuevo perímetro; el rechazo explícito prevalece | Contraseñas de menos de 8 caracteres; omitir `--user` |
+| Laboratorio 3 | 40 min | La identidad es el nuevo perímetro; el rechazo explícito prevalece | Contraseñas de menos de 8 caracteres; omitir `--user`; deshabilitar antes de retirar políticas |
 | Laboratorio 4 | 35 min | Un secreto que llegó a Git está comprometido | `gitleaks detect` sustituido por `gitleaks git` en versiones recientes |
-| Laboratorio 5 | 30 min | Se escanea antes de desplegar | Base de Trivy sin descargar y sin conexión |
+| Laboratorio 5 | 30 min | Se escanea antes de desplegar; ninguna herramienta lo detecta todo | Base de Trivy sin descargar; versión de Trivy comprometida (0.69.4–0.69.6) |
 | Cierre | 15 min | Lista de verificación y reto final | — |
 
 Si el tiempo es insuficiente, pueden omitirse el versionado del Laboratorio 2, la traza del Laboratorio 3 y la parte de registros del Laboratorio 5 sin afectar los objetivos específicos.

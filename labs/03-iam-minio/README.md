@@ -19,7 +19,7 @@ echo "Informe trimestral Q3" | mc pipe nube/informes/q3.txt
 Hasta este punto, todas las operaciones se realizaron con el alias `nube`, que utiliza las credenciales **raíz**. Esa identidad no puede restringirse con políticas.
 
 ```bash
-mc admin user info nube "$MINIO_ROOT_USER"    # se observa el resultado
+mc admin user info nube "$MINIO_ROOT_USER"    # responde que el usuario no existe: la raíz no es un usuario IAM
 mc admin policy list nube                     # políticas predefinidas de MinIO
 mc admin policy info nube readwrite
 ```
@@ -65,6 +65,8 @@ Se completa la tabla ejecutando cada comando:
 | Leer la nómina | `mc cat analista/rrhh/nomina.csv` | |
 | Listar todos los contenedores | `mc ls analista/` | |
 
+> Observación: en el último caso, el servidor no devuelve un error. Muestra **solo** los contenedores a los que la identidad tiene acceso.
+
 ❓ **Pregunta 2.** ¿Por qué `s3:ListBucket` utiliza el recurso `arn:aws:s3:::informes` y `s3:GetObject` utiliza `arn:aws:s3:::informes/*`?
 
 ### C.2 · El rechazo explícito prevalece
@@ -88,12 +90,12 @@ mc cat robot/rrhh/nomina.csv                                   # ¿se permite? �
 
 ## Parte D · Respuesta a incidentes: revocación del acceso (10 min)
 
-Se supone que las credenciales del practicante se filtraron.
+Se supone que las credenciales del practicante se filtraron. El orden importa: el servidor no permite modificar las políticas de un usuario ya deshabilitado, por lo que primero se retiran los permisos y después se deshabilita la cuenta.
 
 ```bash
-mc admin user disable nube practicante
-mc ls practicante/                                   # debe fallar
-mc admin policy detach nube demasiado-permisiva --user practicante
+mc admin policy detach nube demasiado-permisiva --user practicante   # 1. retirar permisos
+mc admin user disable nube practicante                              # 2. deshabilitar la cuenta
+mc ls practicante/                                   # debe fallar: "Your account is disabled"
 mc admin policy detach nube readwrite --user robot-backup     # se corrige el error anterior
 mc admin user list nube
 ```

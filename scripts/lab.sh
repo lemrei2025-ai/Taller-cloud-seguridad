@@ -15,10 +15,22 @@ else
   exit 1
 fi
 
+# Si no existe .env, se genera con una contraseña aleatoria (no depende de .env.example,
+# que puede perderse al copiar el repositorio porque los archivos que empiezan por "." son ocultos).
 if [[ ! -f .env ]]; then
-  echo "[!] No existe .env; se crea desde .env.example. La contraseña debe cambiarse antes del taller."
-  cp .env.example .env
+  clave="Taller-$(head -c 4096 /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9' | cut -c 1-16)"
+  cat >.env <<EOF
+# Generado automáticamente por scripts/lab.sh. Nunca debe subirse a GitHub.
+MINIO_ROOT_USER=admin-taller
+MINIO_ROOT_PASSWORD=$clave
+AWS_ACCESS_KEY_ID=testing
+AWS_SECRET_ACCESS_KEY=testing
+AWS_DEFAULT_REGION=us-east-1
+EOF
+  chmod 600 .env
+  echo "[+] Se creó .env con una contraseña aleatoria para MinIO (consultar con: cat .env)."
 fi
+[[ -f .gitignore ]] || echo "[!] Falta .gitignore: .env podría subirse a GitHub por error." >&2
 
 esperar_minio() {
   echo -n "[*] Esperando a MinIO"

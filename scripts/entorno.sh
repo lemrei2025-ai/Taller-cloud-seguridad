@@ -26,13 +26,13 @@ else
   _MC=mc
 fi
 
-# Alias "nube" del cliente MinIO con la cuenta root (solo para administrar)
-if "$_MC" --version 2>/dev/null | grep -qi minio; then
+# Alias "nube" del cliente (mc/mcli) con la cuenta root (solo para administrar)
+if "$_MC" --version 2>/dev/null | grep -qiE 'minio|silo'; then
   "$_MC" alias set nube http://localhost:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null \
     && echo "[+] Alias 'nube' de mc configurado (cuenta root)."
 else
-  echo "[!] El cliente 'mc' de MinIO no está instalado. Se debe ejecutar: ./scripts/instalar-herramientas.sh" >&2
+  echo "[!] El cliente 'mc' (mcli) no está instalado. Se debe ejecutar: ./scripts/instalar-herramientas.sh" >&2
 fi
 unset _MC
 
-echo "[+] Entorno cargado. Usa 'awsm' para AWS emulado y 'mc ... nube/' para MinIO."
+echo "[+] Entorno cargado: 'awsm' para AWS emulado y 'mc ... nube/' para el almacenamiento S3."

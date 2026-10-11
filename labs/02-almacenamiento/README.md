@@ -51,7 +51,7 @@ En Amazon S3, el patrón clásico de respuestas es el siguiente:
 | `403` | **Existe**, pero no hay permiso (su existencia queda confirmada) |
 | `200` | Existe **y su contenido puede listarse** |
 
-Para comprobar si MinIO distingue entre un contenedor inexistente y uno privado, se crea un contenedor privado (`mc mb nube/finanzas`) y se repite el bucle. No distinguir ambos casos es una buena decisión de diseño, porque no entrega información al atacante.
+Para comprobar si el servidor del laboratorio distingue entre un contenedor inexistente y uno privado, se crea un contenedor privado (`mc mb nube/finanzas`) y se repite el bucle. En las pruebas realizadas, Silo responde `403` en ambos casos: no revela qué contenedores existen, una buena decisión de diseño frente a la enumeración.
 
 ```bash
 # Listado del contenido de un contenedor abierto (respuesta XML)
@@ -97,10 +97,10 @@ Se copia la URL que aparece en *Share:*, se abre con `curl` y se repite el inten
 mc version enable nube/rrhh
 echo "versión corrupta por ransomware" | mc pipe nube/rrhh/nomina.csv
 mc ls --versions nube/rrhh/nomina.csv
-mc cat --vid <ID_DE_VERSION_ANTERIOR> nube/rrhh/nomina.csv   # el original sigue disponible
+mc cat --vid null nube/rrhh/nomina.csv   # el original sigue disponible
 ```
 
-> Si la instalación indica que el versionado no está disponible, se registra la observación. En producción, MinIO se despliega con varios discos (*erasure coding*), configuración en la que el versionado sí está disponible.
+> El archivo original se subió antes de activar el versionado, por eso su identificador de versión es `null`. Las versiones posteriores reciben un identificador único.
 
 ## ✅ Conclusiones del laboratorio
 

@@ -13,14 +13,23 @@ mkdir -p reportes
 ## Parte A · Seguridad de la imagen en ejecución (10 min)
 
 ```bash
-trivy image --severity HIGH,CRITICAL minio/minio:RELEASE.2025-09-07T16-13-09Z
-trivy image --severity HIGH,CRITICAL --format json -o reportes/minio.json \
-  minio/minio:RELEASE.2025-09-07T16-13-09Z
-jq '[.Results[].Vulnerabilities // [] | .[]] | group_by(.Severity) | map({(.[0].Severity): length}) | add' \
-  reportes/minio.json
+trivy --version                                    # nunca 0.69.4, 0.69.5 ni 0.69.6
+trivy image --severity HIGH,CRITICAL pgsty/silo:RELEASE.2026-09-16T00-00-00Z
+trivy image --severity HIGH,CRITICAL --format json -o reportes/silo.json \
+  pgsty/silo:RELEASE.2026-09-16T00-00-00Z
+jq '[.Results[]?.Vulnerabilities // [] | .[]] | group_by(.Severity) | map({(.[0].Severity): length}) | add' \
+  reportes/silo.json
 ```
 
-❓ **Pregunta 1.** MinIO dejó de publicar imágenes comunitarias en octubre de 2025. ¿Qué opciones tiene una organización que depende de este componente? ¿Qué riesgo de **cadena de suministro** introduce depender de una imagen que no recibe actualizaciones?
+El propio taller ilustra tres incidentes reales de cadena de suministro de 2025–2026:
+
+| Componente | Qué ocurrió | Impacto |
+|---|---|---|
+| MinIO | Dejó de publicar versiones comunitarias (octubre de 2025) y eliminó sus imágenes de Docker Hub (septiembre de 2026) | Los despliegues fallan con `pull access denied`; las imágenes antiguas no reciben parches |
+| LocalStack | Pasó a exigir cuenta y token para iniciar su contenedor (marzo de 2026) | Los entornos de pruebas sin token dejan de funcionar |
+| Trivy | Versiones 0.69.4 a 0.69.6 publicadas con código malicioso (marzo de 2026) | Robo de credenciales de los equipos y pipelines que las ejecutaron |
+
+❓ **Pregunta 1.** ¿Qué controles reducen cada uno de estos riesgos? (Pista: fijar versiones o *digests*, réplica propia del registro de imágenes, verificación de firmas, alternativas evaluadas de antemano).
 
 ## Parte B · Infraestructura como código insegura (12 min)
 
@@ -32,7 +41,7 @@ trivy config terraform/
 trivy config --severity HIGH,CRITICAL terraform/ -f table
 ```
 
-Se completa la tabla con los hallazgos de Trivy:
+Con Trivy 0.69.3, el análisis reporta **13 hallazgos** (2 críticos, 8 altos, 1 medio y 2 bajos). Se completa la tabla:
 
 | Recurso | Problema | Riesgo | Corrección |
 |---|---|---|---|
@@ -41,6 +50,8 @@ Se completa la tabla con los hallazgos de Trivy:
 | `aws_instance.web` (metadatos) | | | |
 | `aws_instance.web` (disco) | | | |
 | `aws_iam_policy.app` | | | |
+
+❓ **Pregunta 2.** La plantilla contiene una política IAM con `"Action": "*"` y `"Resource": "*"`. ¿Aparece entre los hallazgos de Trivy? ¿Qué conclusión se obtiene sobre depender de una sola herramienta? (Comparar con el auditor del Laboratorio 4.)
 
 ✏️ **Ejercicio:** se copia el archivo a `terraform/main-corregido.tf`, se corrigen los hallazgos y se repite `trivy config terraform/` hasta que solo queden hallazgos justificables.
 
@@ -69,7 +80,7 @@ Se detiene la traza con `Ctrl+C` y se analiza:
 grep -cE 'AccessDenied|403' reportes/traza.log
 ```
 
-❓ **Pregunta 2.** ¿Qué campos de la traza sustentarían una alerta de "usuario que intenta leer datos de recursos humanos"? ¿Qué servicios cumplen esa función en AWS?
+❓ **Pregunta 3.** ¿Qué campos de la traza sustentarían una alerta de "usuario que intenta leer datos de recursos humanos"? ¿Qué servicios cumplen esa función en AWS?
 
 ## ✅ Conclusiones del laboratorio
 

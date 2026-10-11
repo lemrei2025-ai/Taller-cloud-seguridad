@@ -16,6 +16,9 @@ echo "== Herramientas =="
 for h in docker aws mc jq curl git nmap gitleaks trivy; do
   check "$h instalado" command -v "$h"
 done
+check "mc es el cliente S3 (no Midnight Commander)" bash -c "/usr/local/bin/mc --version 2>/dev/null | grep -qiE 'minio|silo'"
+tv="$(trivy --version 2>/dev/null | awk '/^Version:/{print $2}')"
+check "Trivy ${tv:-?} no es una versión comprometida (0.69.4-0.69.6)" bash -c "[[ -n '$tv' && ! '$tv' =~ ^0\.69\.[456]$ ]]"
 check "Docker Compose disponible" bash -c 'docker compose version || docker-compose version'
 check "Docker usable sin sudo" docker info
 

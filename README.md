@@ -16,7 +16,7 @@ El taller no requiere cuentas en AWS, Azure ni GCP. Todo se ejecuta en el equipo
  │        │                    │                                     │
  │        ▼                    ▼                                     │
  │  ┌──────────────┐    ┌──────────────┐     red Docker "nube"       │
- │  │ MinIO        │    │ Moto         │                             │
+ │  │ Silo (MinIO) │    │ Moto 5.2.3   │                             │
  │  │ S3 + IAM     │    │ API de AWS   │                             │
  │  │ :9000 / :9001│    │ :5000        │                             │
  │  └──────────────┘    └──────────────┘                             │
@@ -25,7 +25,7 @@ El taller no requiere cuentas en AWS, Azure ni GCP. Todo se ejecuta en el equipo
 
 | Componente | Función en el taller | Equivalente en la nube pública |
 |---|---|---|
-| **MinIO** | Almacenamiento de objetos con usuarios y políticas que se aplican efectivamente | Amazon S3 + AWS IAM |
+| **Silo** (bifurcación comunitaria de MinIO) | Almacenamiento de objetos con usuarios y políticas que se aplican efectivamente | Amazon S3 + AWS IAM |
 | **Moto** | Emulación de las API de AWS (IAM, STS, Secrets Manager) | Cuenta de AWS de pruebas |
 | **Docker** | Ejecución y aislamiento de los servicios | Capa de cómputo del proveedor |
 
@@ -81,7 +81,9 @@ source scripts/entorno.sh            # carga alias y credenciales en la terminal
 
 ## Selección de componentes (octubre de 2026)
 
-- **MinIO** puso su edición comunitaria en modo de mantenimiento y dejó de publicar imágenes de contenedor. El taller utiliza la última imagen publicada, fijada por versión, y la analiza en el Laboratorio 5 como caso de riesgo de cadena de suministro. **No se recomienda su uso en producción.**
+- **MinIO** archivó su edición comunitaria y, en septiembre de 2026, **eliminó sus imágenes de Docker Hub** (el error `pull access denied for minio/minio`). El taller usa **Silo** (`pgsty/silo`), una bifurcación comunitaria mantenida y compatible con MinIO: mismas variables `MINIO_*`, mismos puertos y el mismo cliente (`mcli`, que se instala como `mc`).
+- **Trivy** sufrió un ataque de cadena de suministro en marzo de 2026: las versiones 0.69.4, 0.69.5 y 0.69.6 eran maliciosas. `scripts/verificar-entorno.sh` comprueba que la versión instalada no sea una de ellas.
+- Todas las imágenes se fijan por versión (`pgsty/silo:RELEASE.2026-09-16T00-00-00Z`, `motoserver/moto:5.2.3`). Estos tres casos se analizan en el Laboratorio 5 como riesgos reales de cadena de suministro.
 - **LocalStack** exige desde marzo de 2026 una cuenta y un token incluso en su plan gratuito. Por ello el taller usa **Moto**, que no requiere registro. Quien disponga de un token de LocalStack puede sustituir el servicio `moto` por LocalStack en el puerto 4566; los comandos `aws` no cambian.
 
 ## Uso ético
